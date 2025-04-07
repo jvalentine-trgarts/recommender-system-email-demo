@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --font-sans: InterVariable, sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <div class="max-w-2xl mx-auto p-6 bg-white">
+      <div class="flex justify-between align-center">
+        <span class="text-sm/6 text-gray-500">
+          We think you'll love these shows...</span
+        >
+        <a href="#" class="text-sm/6 font-semibold text-cyan-700"
+          >Read in browser <span aria-hidden="true">→</span></a
+        >
+      </div>
+
+      <div class="mt-12">
+        <img src="59e59.svg" alt="" class="w-1/2 mx-auto my-6" />
+      </div>
+
+      <div class="bg-cyan-50 rounded-lg p-10 text-center mt-6">
+        <h1
+          class="text-balance text-5xl font-bold tracking-tight text-cyan-800"
+        >
+          We think you'll 💖 these shows
+        </h1>
+        <p class="mt-8 text-pretty text-lg font-medium text-cyan-900">
+          We've curated this list of events from our partner venues in your area
+          for you. We're sure that you love them.
+        </p>
+      </div>
+
+      <!-- Alpine component that will display the events -->
+      <div x-data="eventsData()" x-init="fetchEvents()">
+        <!-- Loading state -->
+        <div x-show="loading" class="text-center py-8">Loading events...</div>
+
+        <!-- Error state -->
+        <div
+          x-show="error"
+          x-text="error"
+          class="error bg-red-100 text-red-800 p-4 rounded mt-4"
+        ></div>
+
+        <!-- Display events -->
+        <div x-show="!loading && !error" class="mt-8">
+          <template x-for="event in events" :key="event.id">
+            <div
+              class="grid grid-cols-3 gap-8 pb-8 border-b mb-8 border-gray-200"
+            >
+              <template x-if="event.imageUrl">
+                <img
+                  :src="event.imageUrl"
+                  :alt="event.name"
+                  class="object-cover aspect-square rounded-md bg-gray-100 ring-1 ring-black/10"
+                />
+              </template>
+              <template x-if="!event.imageUrl">
+                <div
+                  class="relative aspect-square flex items-center justify-center bg-[url(placeholder.png)] bg-cover rounded-md bg-gray-100 ring-1 ring-black/10"
+                >
+                  <span
+                    class="font-bold text-xl text-center text-cyan-700 drop-shadow-[2px_2px_1px_rgba(255,255,255,0.8)]"
+                    x-text="event.name"
+                  ></span>
+                </div>
+              </template>
+
+              <div class="col-span-2">
+                <p
+                  x-text="event.instanceDates"
+                  class="block text-sm leading-6 text-gray-500 dark:text-gray-400"
+                ></p>
+                <h2
+                  x-text="event.name"
+                  class="mt-2 text-lg font-semibold text-gray-900 dark:text-gray-200"
+                ></h2>
+                <p
+                  x-text="event.description"
+                  class="mt-4 line-clamp-3 text-sm leading-6 text-gray-500 dark:text-gray-400"
+                ></p>
+                <div class="mt-6 flex items-center gap-x-6">
+                  <a
+                    href="#"
+                    class="rounded-md bg-cyan-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-cyan-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400"
+                    >Buy Tickets</a
+                  >
+                  <a href="#" class="text-sm/6 font-semibold text-gray-500"
+                    >Learn more <span aria-hidden="true">→</span></a
+                  >
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <div class="text-center">
+          <h2
+            class="text-balance text-2xl font-semibold tracking-tight text-gray-900"
+          >
+            How well do we know you?
+          </h2>
+          <p class="mt-3 text-balance text-base text-gray-600">
+            Let us know how accurate these recommendations were, and get even
+            better recommendations next time.
+          </p>
+          <div class="mt-6 flex items-center justify-center gap-x-6">
+            <a
+              href="#"
+              class="rounded-md bg-green-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
+              >👍 They were great</a
+            >
+            <a
+              href="#"
+              class="rounded-md bg-red-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+              >👎 Could be better</a
+            >
+          </div>
+        </div>
+
+        <div class="bg-cyan-50 rounded-lg p-6 text-center mt-12">
+          <p class="text-sm/6 text-balance text-gray-600">
+            This email is sent by TRG Arts on behalf of [venue name]. You are
+            receiving this communication because you are a customer of [venue
+            name]. Our mailing address is PO Box 38879, Colorado Springs, CO
+            80937-8879. To unsubscribe from future communications, [click here].
+          </p>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Alpine component with data and methods
+      function eventsData() {
+        return {
+          events: [],
+          loading: true,
+          error: null,
+          // Array of local JSON files to use
+          jsonFiles: [
+            "59e59.json",
+            "algonquin.json",
+            "tworivertheater.json",
+            "vineyardtheatre.json",
+          ],
+
+          // Function to get random items from an array
+          getRandomItems(array, count) {
+            // Create a copy of the array to avoid modifying the original
+            const shuffled = [...array];
+
+            // Shuffle the array
+            for (let i = shuffled.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+
+            // Return the first 'count' items or all items if less than count
+            return shuffled.slice(0, Math.min(count, shuffled.length));
+          },
+
+          fetchEvents() {
+            // Store promises for all fetch requests
+            const fetchPromises = this.jsonFiles.map((filename) => {
+              return fetch(filename)
+                .then((response) => {
+                  if (!response.ok) {
+                    throw new Error(
+                      `Failed to load ${filename}: ${response.status}`
+                    );
+                  }
+                  return response.json();
+                })
+                .catch((error) => {
+                  console.error(`Error loading ${filename}:`, error);
+                  // Return empty array if file fails to load
+                  return [];
+                });
+            });
+
+            // Wait for all fetches to complete
+            Promise.all(fetchPromises)
+              .then((results) => {
+                // Combine all events into a single array
+                const allEvents = results.flat();
+
+                // No filtering - keep all events regardless of image
+
+                // Get 5 random events (or fewer if there aren't 5)
+                this.events = this.getRandomItems(allEvents, 5);
+                this.loading = false;
+              })
+              .catch((error) => {
+                this.error = `Error processing events: ${error.message}`;
+                this.loading = false;
+                console.error("Error:", error);
+              });
+          },
+        };
+      }
+    </script>
+  </body>
+</html>
